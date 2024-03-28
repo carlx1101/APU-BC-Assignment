@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BranchController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,6 +35,8 @@ All Admin Routes List
 Route::middleware(['auth', 'user-access:admin'])->group(function () {
 
     Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.home');
+    Route::resource('branches', BranchController::class);
+
 });
 
 /*------------------------------------------
