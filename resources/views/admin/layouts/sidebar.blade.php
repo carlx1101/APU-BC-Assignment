@@ -30,6 +30,13 @@
 							</li>
 							<!-- End Tables -->
 
+                            <li class="u-sidebar-nav-menu__item">
+								<a class="u-sidebar-nav-menu__link" href="{{route('doctors.index')}}">
+									<i class="far fa-list-alt u-sidebar-nav-menu__item-icon"></i>
+									<span class="u-sidebar-nav-menu__item-title">Register Doctor</span>
+								</a>
+							</li>
+
 
 							<!-- Other Pages -->
 							{{-- <li class="u-sidebar-nav-menu__item u-sidebar-nav--opened">

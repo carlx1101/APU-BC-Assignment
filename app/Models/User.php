@@ -73,4 +73,9 @@ class User extends Authenticatable
             get: fn ($value) =>  ["patient", "admin", "doctor"][$value],
         );
     }
+
+    public function branchDoctors()
+    {
+        return $this->hasMany(BranchDoctor::class, 'doctor_id');
+    }
 }

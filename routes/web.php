@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\DoctorController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 
     Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.home');
     Route::resource('branches', BranchController::class);
+    Route::resource('doctors', DoctorController::class);
 
 });
 

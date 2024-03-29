@@ -10,5 +10,10 @@ class Branch extends Model
     use HasFactory;
 
     protected $guarded = [];
-    
+
+    public function branchDoctors()
+    {
+        return $this->hasMany(BranchDoctor::class);
+    }
+
 }
