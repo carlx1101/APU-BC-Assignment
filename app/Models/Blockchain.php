@@ -20,6 +20,19 @@ class Blockchain extends Model
         'transactions'
     ];
 
+
+    /**
+     * Verify Signature.
+     */
+    public static function verifySignature($data, $signature, $publicKey)
+    {
+        return openssl_verify($data, base64_decode($signature), $publicKey, OPENSSL_ALGO_SHA256) === 1;
+    }
+
+
+    /**
+     * Hashing block using SHA-256.
+     */
     public static function hashBlock($block)
     {
         $block_string = json_encode([
@@ -32,18 +45,29 @@ class Blockchain extends Model
         return hash('sha256', $block_string);
     }
 
+    /**
+     * Encrypt data in block.
+     */
     public static function encryptData($data, $key)
     {
-        $encrypter = new Encrypter($key, 'AES-256-CBC');
-        return $encrypter->encrypt($data);
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $salt = openssl_random_pseudo_bytes(16); // Generate a random salt
+        $encrypted = openssl_encrypt($data, 'aes-256-cbc', $key, 0, $iv);
+        return base64_encode($encrypted . '::' . $salt . '::' . $iv); // Store salt along with encrypted data
     }
 
+    /**
+     * Encrypt data from block.
+     */
     public static function decryptData($encryptedData, $key)
     {
-        $encrypter = new Encrypter($key, 'AES-256-CBC');
-        return $encrypter->decrypt($encryptedData);
+        list($encryptedData, $salt, $iv) = explode('::', base64_decode($encryptedData), 3);
+        return openssl_decrypt($encryptedData, 'aes-256-cbc', $key, 0, $iv);
     }
 
+    /**
+     * Calculating the merkle root.
+     */
     public static function calcMerkleRoot($transactions)
     {
         $hashes = array_map(function ($transaction) {
@@ -64,6 +88,9 @@ class Blockchain extends Model
     }
 
 
+    /**
+     * Storing block into the blockchain.
+     */
     public static function storeBlockchain($blockchain)
     {
         $filename = storage_path('blockchain.dat');
@@ -71,6 +98,9 @@ class Blockchain extends Model
         file_put_contents($filename, $data);
     }
 
+    /**
+     * Loading the distributed ledger.
+     */
     public static function loadBlockchain()
     {
         $filename = storage_path('blockchain.dat');

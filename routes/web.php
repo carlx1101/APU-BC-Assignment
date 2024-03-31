@@ -61,4 +61,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/blockchain/{block_hash}', [BlockchainController::class, 'getBlock']);
 });
 
+new BlockchainController();
 BlockchainController::generateGenesisBlock();

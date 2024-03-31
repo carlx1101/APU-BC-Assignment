@@ -4,12 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Blockchain;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class BlockchainController extends Controller
 {
-    private $symmetricKey = '';
-    private $publicKey = '';
-    private $privateKey = '';
+    private $symmetricKey;
+    private $publicKey;
+    private $privateKey;
+
+    /**
+     *  Create encryption key on initialization.
+     */
+    public function __construct()
+    {
+        // Generate Symmetric Key
+        $this->symmetricKey = Config::get('blockchain.symmetric_key');
+
+        // Generate Public/Private Key Pair
+        $this->privateKey = Config::get('blockchain.private_key');
+        $this->publicKey = Config::get('blockchain.public_key');
+
+        echo "Generated Symmetric Key: " . $this->symmetricKey  . "\n";
+        echo "Generated Private Key: " . $this->privateKey . "\n";
+        echo "Generated Public Key: " . $this->publicKey . "\n";
+    }
 
     /**
      * Generate Genesis Block.
@@ -124,7 +142,10 @@ class BlockchainController extends Controller
                     'digital_signature' => $block['transactions']['digital_signature']
                 ];
 
-                return response()->json(['block' => $block, 'decrypted_data' => $decryptedData], 200);
+                // Verify Digital Signature
+                $isSignatureValid = Blockchain::verifySignature($decryptedData['data'], $decryptedData['digital_signature'], $this->publicKey);
+
+                return response()->json(['block' => $block, 'decrypted_data' => $decryptedData, 'is_signature_valid' => $isSignatureValid], 200);
             }
         }
 
