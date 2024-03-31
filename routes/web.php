@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlockchainController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BranchController;
@@ -38,7 +39,6 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.home');
     Route::resource('branches', BranchController::class);
     Route::resource('doctors', DoctorController::class);
-
 });
 
 /*------------------------------------------
@@ -50,3 +50,15 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 
     Route::get('/doctor/home', [HomeController::class, 'doctorHome'])->name('doctor.home');
 });
+
+/*------------------------------------------
+--------------------------------------------
+Blockchain Routes
+--------------------------------------------
+--------------------------------------------*/
+Route::middleware(['auth'])->group(function () {
+    Route::post('/blockchain/add', [BlockchainController::class, 'addBlock']);
+    Route::get('/blockchain/{block_hash}', [BlockchainController::class, 'getBlock']);
+});
+
+BlockchainController::generateGenesisBlock();
