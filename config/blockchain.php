@@ -18,4 +18,7 @@ return [
 
     'public_key' => env('BLOCKCHAIN_PUBLIC_KEY'),
 
+    'hospital_admin_master_key' => env('HOSPITAL_ADMIN_MASTER_PRIVATE_KEY'),
+
+    'hospital_admin_master_public_key' => env('HOSPITAL_ADMIN_MASTER_PUBLIC_KEY'),
 ];
