@@ -23,10 +23,6 @@ class BlockchainController extends Controller
         // Generate Public/Private Key Pair
         $this->privateKey = Config::get('blockchain.private_key');
         $this->publicKey = Config::get('blockchain.public_key');
-
-        echo "Generated Symmetric Key: " . $this->symmetricKey  . "\n";
-        echo "Generated Private Key: " . $this->privateKey . "\n";
-        echo "Generated Public Key: " . $this->publicKey . "\n";
     }
 
     /**
