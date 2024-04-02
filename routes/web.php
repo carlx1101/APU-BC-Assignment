@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\PreferenceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,6 +28,8 @@ Route::middleware([
 Route::middleware(['auth', 'user-access:patient'])->group(function () {
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::resource('appointments', AppointmentController::class);
+    Route::resource('preferences', PreferenceController::class);
 });
 
 /*------------------------------------------
