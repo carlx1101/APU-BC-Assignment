@@ -93,8 +93,12 @@ class BlockchainController extends Controller
 
         // Encrypt Data and create digital signature
         $encryptedData = [
-            'data' => Blockchain::encryptData($data['data'], $this->symmetricKey),
-            'encrypted_symmetric_key' => Blockchain::encryptData($this->symmetricKey, $this->publicKey),
+            'data' => isset($data['recipientPublicKey'])
+                ? Blockchain::encryptData(Blockchain::encryptData($data['data'], $this->symmetricKey), $data['recipientPublicKey'])
+                : Blockchain::encryptData($data['data'], $this->symmetricKey),
+            'encrypted_symmetric_key' => isset($data['recipientPublicKey'])
+                ? Blockchain::encryptData($this->symmetricKey, $data['recipientPublicKey'])
+                : Blockchain::encryptData($this->symmetricKey, $this->publicKey),
             'digital_signature' => $this->signData($data['data'], $this->privateKey),
         ];
 
