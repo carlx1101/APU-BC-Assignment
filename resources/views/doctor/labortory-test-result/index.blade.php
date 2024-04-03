@@ -3,7 +3,7 @@
 <!-- Head -->
 
 <head>
-    <title>Clinical Notes | {{ env('APP_NAME') }}</title>
+    <title>Labortory Test | {{ env('APP_NAME') }}</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
@@ -41,21 +41,21 @@
                 <!-- End Breadcrumb -->
                 <div class="mb-4">
                     <nav aria-label="breadcrumb">
-                        <h1 class="h3">Clinical Notes</h1>
+                        <h1 class="h3">Labortory Test</h1>
                         <ol class="breadcrumb bg-transparent small p-0">
                             <li class="breadcrumb-item"><a href="{{ route('doctor.home') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Clinical Notes</li>
+                            <li class="breadcrumb-item active" aria-current="page">Labortory Test</li>
                         </ol>
                     </nav>
                 </div>
                 <!-- End Breadcrumb -->
 
-                <!-- Clinical Notes -->
+                <!-- Medication -->
                 <div class="card mb-4">
                     <header class="card-header d-md-flex align-items-center">
-                        <h2 class="h3 card-header-title">Clinical Note</h2>
+                        <h2 class="h3 card-header-title">Labortory Test</h2>
                         <a class="btn btn-primary ml-md-auto"
-                            href="{{ route('doctor.clinical-note.create') }}">Create</a>
+                            href="{{ route('doctor.labortory-result.create') }}">Create</a>
                     </header>
 
                     <div class="card-body">
@@ -65,26 +65,25 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Patient Name</th>
-                                        <th scope="col">Diagnosis</th>
-                                        <th scope="col">Treatment Plan</th>
-                                        <th scope="col">Follow-up Recommendation</th>
-                                        <th scope="col">Referral</th>
-                                        <th scope="col">Treatment Time</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Result</th>
+                                        <th scope="col">Reference Range</th>
+                                        <th scope="col">Testing Facility</th>
+                                        <th scope="col">Date</th>
                                         <th class="text-center" scope="col">Actions</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($clinicalNotes as $clinicalNote)
+                                    @foreach ($labTestResults as $labResult)
                                     <tr>
-                                        <td>{{ $clinicalNote->id }}</td>
-                                        <td>{{ $clinicalNote->name }}</td>
-                                        <td>{{ $clinicalNote->diagnosis }}</td>
-                                        <td>{{ $clinicalNote->treatment_plan }}</td>
-                                        <td>{{ $clinicalNote->follow_up_recommendations }}</td>
-                                        <td>{{ $clinicalNote->referrals }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($clinicalNote->assessment_datetime)->format('l, F
-                                            j, Y \a\t g:i A') }}</td>
+                                        <td>{{ $labResult->id }}</td>
+                                        <td>{{ $labResult->patient->name }}</td>
+                                        <td>{{ $labResult->test_type }}</td>
+                                        <td>{{ $labResult->test_result }}</td>
+                                        <td>{{ $labResult->reference_range }}</td>
+                                        <td>{{ $labResult->testing_facility }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($labResult->test_date)->format('l, F j, Y') }}</td>
                                         <td class="text-center">
                                             <a id="actions1Invoker" class="link-muted" href="#!" aria-haspopup="true"
                                                 aria-expanded="false" data-toggle="dropdown">
@@ -116,7 +115,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- End Clinical Notes -->
+                <!-- End Medication -->
             </div>
 
 

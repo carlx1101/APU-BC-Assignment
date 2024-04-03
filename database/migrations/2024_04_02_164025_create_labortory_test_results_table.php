@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('labortory_test_results', function (Blueprint $table) {
             $table->id();
-            $table->string('test_type');
-            $table->dateTime('test_date');
-            $table->string('test_result');
-            $table->string('reference_range');
-            $table->string('testing_facility');
+            $table->string('test_type')->nullable();
+            $table->date('test_date')->nullable();
+            $table->string('test_result')->nullable();
+            $table->string('reference_range')->nullable();
+            $table->string('testing_facility')->nullable();
             $table->text('interpretation')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('physician_attendant_id')->references('id')->on('users')->onDelete('cascade');

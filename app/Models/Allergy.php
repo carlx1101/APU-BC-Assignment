@@ -9,6 +9,10 @@ class Allergy extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
+    protected $table = "allergies";
+
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');

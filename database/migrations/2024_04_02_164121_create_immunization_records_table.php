@@ -13,21 +13,21 @@ return new class extends Migration
     {
         Schema::create('immunization_records', function (Blueprint $table) {
             $table->id();
-            $table->date('date_of_immunization');
-            $table->string('vaccine_name');
-            $table->string('manufacturer');
-            $table->string('lot_number');
-            $table->string('dose_number');
-            $table->string('administration_route');
-            $table->string('anatomical_site');
+            $table->date('date_of_immunization')->nullable();
+            $table->string('vaccine_name')->nullable();
+            $table->string('manufacturer')->nullable();
+            $table->string('lot_number')->nullable();
+            $table->string('dose_number')->nullable();
+            $table->string('administration_route')->nullable();
+            $table->string('anatomical_site')->nullable();
             $table->string('adverse_reaction')->nullable();
             $table->date('next_due_date')->nullable();
-            $table->string('vaccination_status');
+            $table->string('vaccination_status')->nullable();
             $table->text('contraindications')->nullable();
-            $table->string('patient_consent');
+            $table->string('patient_consent')->nullable();
             $table->text('vaccination_schedule')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreignId('immunization_provider_id')->references('id')->on('branches')->onDelete('cascade');
+            $table->foreignId('immunization_provider_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

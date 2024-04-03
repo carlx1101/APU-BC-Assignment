@@ -9,6 +9,10 @@ class ImmunizationRecord extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
+    protected $table = "immunization_records";
+
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');

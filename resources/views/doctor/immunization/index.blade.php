@@ -3,7 +3,7 @@
 <!-- Head -->
 
 <head>
-    <title>Clinical Notes | {{ env('APP_NAME') }}</title>
+    <title>Immunization | {{ env('APP_NAME') }}</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
@@ -41,10 +41,10 @@
                 <!-- End Breadcrumb -->
                 <div class="mb-4">
                     <nav aria-label="breadcrumb">
-                        <h1 class="h3">Clinical Notes</h1>
+                        <h1 class="h3">Immunization Record</h1>
                         <ol class="breadcrumb bg-transparent small p-0">
                             <li class="breadcrumb-item"><a href="{{ route('doctor.home') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Clinical Notes</li>
+                            <li class="breadcrumb-item active" aria-current="page">Immunization</li>
                         </ol>
                     </nav>
                 </div>
@@ -53,9 +53,9 @@
                 <!-- Clinical Notes -->
                 <div class="card mb-4">
                     <header class="card-header d-md-flex align-items-center">
-                        <h2 class="h3 card-header-title">Clinical Note</h2>
+                        <h2 class="h3 card-header-title">Immunization Record</h2>
                         <a class="btn btn-primary ml-md-auto"
-                            href="{{ route('doctor.clinical-note.create') }}">Create</a>
+                            href="{{ route('doctor.immunization.create') }}">Create</a>
                     </header>
 
                     <div class="card-body">
@@ -65,26 +65,33 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Patient Name</th>
-                                        <th scope="col">Diagnosis</th>
-                                        <th scope="col">Treatment Plan</th>
-                                        <th scope="col">Follow-up Recommendation</th>
-                                        <th scope="col">Referral</th>
-                                        <th scope="col">Treatment Time</th>
+                                        <th scope="col">Vaccine Name</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Dose Number</th>
+                                        <th scope="col">Date of Immunization</th>
+                                        <th scope="col">Next Due</th>
                                         <th class="text-center" scope="col">Actions</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($clinicalNotes as $clinicalNote)
+                                    @foreach ($immunizationRecords as $immunizationRecord)
                                     <tr>
-                                        <td>{{ $clinicalNote->id }}</td>
-                                        <td>{{ $clinicalNote->name }}</td>
-                                        <td>{{ $clinicalNote->diagnosis }}</td>
-                                        <td>{{ $clinicalNote->treatment_plan }}</td>
-                                        <td>{{ $clinicalNote->follow_up_recommendations }}</td>
-                                        <td>{{ $clinicalNote->referrals }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($clinicalNote->assessment_datetime)->format('l, F
-                                            j, Y \a\t g:i A') }}</td>
+                                        <td>{{ $immunizationRecord->id }}</td>
+                                        <td>{{ $immunizationRecord->patient->name }}</td>
+                                        <td>{{ $immunizationRecord->vaccine_name }}</td>
+                                        <td>{{ $immunizationRecord->vaccination_status }}</td>
+                                        <td>{{ $immunizationRecord->dose_number }}</td>
+                                        <td>{{
+                                            \Carbon\Carbon::parse($immunizationRecord->date_of_immunization)->format('l,
+                                            F j,
+                                            Y') }}
+                                        </td>
+                                        <td>{{
+                                            \Carbon\Carbon::parse($immunizationRecord->next_due_date)->format('l,
+                                            F j,
+                                            Y') }}
+                                        </td>
                                         <td class="text-center">
                                             <a id="actions1Invoker" class="link-muted" href="#!" aria-haspopup="true"
                                                 aria-expanded="false" data-toggle="dropdown">

@@ -3,7 +3,7 @@
 <!-- Head -->
 
 <head>
-    <title>Clinical Notes | {{ env('APP_NAME') }}</title>
+    <title>Vital Result | {{ env('APP_NAME') }}</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
@@ -41,21 +41,21 @@
                 <!-- End Breadcrumb -->
                 <div class="mb-4">
                     <nav aria-label="breadcrumb">
-                        <h1 class="h3">Clinical Notes</h1>
+                        <h1 class="h3">Vital Result</h1>
                         <ol class="breadcrumb bg-transparent small p-0">
                             <li class="breadcrumb-item"><a href="{{ route('doctor.home') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Clinical Notes</li>
+                            <li class="breadcrumb-item active" aria-current="page">Vital Result</li>
                         </ol>
                     </nav>
                 </div>
                 <!-- End Breadcrumb -->
 
-                <!-- Clinical Notes -->
+                <!-- Vital Result -->
                 <div class="card mb-4">
                     <header class="card-header d-md-flex align-items-center">
-                        <h2 class="h3 card-header-title">Clinical Note</h2>
+                        <h2 class="h3 card-header-title">Vital Result</h2>
                         <a class="btn btn-primary ml-md-auto"
-                            href="{{ route('doctor.clinical-note.create') }}">Create</a>
+                            href="{{ route('doctor.vital-result.create') }}">Create</a>
                     </header>
 
                     <div class="card-body">
@@ -65,25 +65,32 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Patient Name</th>
-                                        <th scope="col">Diagnosis</th>
-                                        <th scope="col">Treatment Plan</th>
-                                        <th scope="col">Follow-up Recommendation</th>
-                                        <th scope="col">Referral</th>
-                                        <th scope="col">Treatment Time</th>
+                                        <th scope="col">Blood Pressure</th>
+                                        <th scope="col">Heart Rate</th>
+                                        <th scope="col">Respitory Rate</th>
+                                        <th scope="col">Temperature</th>
+                                        <th scope="col">Oxygen Saturation</th>
+                                        <th scope="col">Weight</th>
+                                        <th scope="col">Height</th>
+                                        <th scope="col">BMI</th>
+                                        <th scope="col">Measurement Date</th>
                                         <th class="text-center" scope="col">Actions</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($clinicalNotes as $clinicalNote)
+                                    @foreach ($vitalResults as $vitalResult)
                                     <tr>
-                                        <td>{{ $clinicalNote->id }}</td>
-                                        <td>{{ $clinicalNote->name }}</td>
-                                        <td>{{ $clinicalNote->diagnosis }}</td>
-                                        <td>{{ $clinicalNote->treatment_plan }}</td>
-                                        <td>{{ $clinicalNote->follow_up_recommendations }}</td>
-                                        <td>{{ $clinicalNote->referrals }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($clinicalNote->assessment_datetime)->format('l, F
+                                        <td>{{ $vitalResult->patient->name }}</td>
+                                        <td>{{ $vitalResult->blood_pressure }}</td>
+                                        <td>{{ $vitalResult->heart_rate }}</td>
+                                        <td>{{ $vitalResult->respiratory_rate }}</td>
+                                        <td>{{ $vitalResult->temperature }}</td>
+                                        <td>{{ $vitalResult->oxygen_saturation }}</td>
+                                        <td>{{ $vitalResult->weight }}</td>
+                                        <td>{{ $vitalResult->height }}</td>
+                                        <td>{{ $vitalResult->BMI }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($vitalResult->measurement_datetime)->format('l, F
                                             j, Y \a\t g:i A') }}</td>
                                         <td class="text-center">
                                             <a id="actions1Invoker" class="link-muted" href="#!" aria-haspopup="true"
@@ -116,7 +123,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- End Clinical Notes -->
+                <!-- End Vital Result -->
             </div>
 
 

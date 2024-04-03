@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('allergies', function (Blueprint $table) {
             $table->id();
-            $table->string('allergen_name');
-            $table->string('reaction_type');
-            $table->string('severity');
-            $table->date('onset_date');
+            $table->string('allergen_name')->nullable();
+            $table->string('reaction_type')->nullable();
+            $table->string('severity')->nullable();
+            $table->date('onset_date')->nullable();
             $table->date('resolution_date')->nullable();
             $table->text('management_plan')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
