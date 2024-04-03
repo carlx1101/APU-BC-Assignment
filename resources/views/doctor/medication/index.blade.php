@@ -3,7 +3,7 @@
 <!-- Head -->
 
 <head>
-    <title>Clinical Notes | {{ env('APP_NAME') }}</title>
+    <title>Medications | {{ env('APP_NAME') }}</title>
 
     <!-- Meta -->
     <meta charset="utf-8">
@@ -41,21 +41,20 @@
                 <!-- End Breadcrumb -->
                 <div class="mb-4">
                     <nav aria-label="breadcrumb">
-                        <h1 class="h3">Clinical Notes</h1>
+                        <h1 class="h3">Medication</h1>
                         <ol class="breadcrumb bg-transparent small p-0">
                             <li class="breadcrumb-item"><a href="{{ route('doctor.home') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Clinical Notes</li>
+                            <li class="breadcrumb-item active" aria-current="page">Medication</li>
                         </ol>
                     </nav>
                 </div>
                 <!-- End Breadcrumb -->
 
-                <!-- Clinical Notes -->
+                <!-- Medication -->
                 <div class="card mb-4">
                     <header class="card-header d-md-flex align-items-center">
-                        <h2 class="h3 card-header-title">Clinical Note</h2>
-                        <a class="btn btn-primary ml-md-auto"
-                            href="{{ route('doctor.clinical-note.create') }}">Create</a>
+                        <h2 class="h3 card-header-title">Medication</h2>
+                        <a class="btn btn-primary ml-md-auto" href="{{ route('doctor.medication.create') }}">Create</a>
                     </header>
 
                     <div class="card-body">
@@ -65,26 +64,26 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Patient Name</th>
-                                        <th scope="col">Diagnosis</th>
-                                        <th scope="col">Treatment Plan</th>
-                                        <th scope="col">Follow-up Recommendation</th>
-                                        <th scope="col">Referral</th>
-                                        <th scope="col">Treatment Time</th>
+                                        <th scope="col">Medication Name</th>
+                                        <th scope="col">Dosage</th>
+                                        <th scope="col">Frequency</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
                                         <th class="text-center" scope="col">Actions</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($clinicalNotes as $clinicalNote)
+                                    @foreach ($medications as $medication)
                                     <tr>
-                                        <td>{{ $clinicalNote->id }}</td>
-                                        <td>{{ $clinicalNote->name }}</td>
-                                        <td>{{ $clinicalNote->diagnosis }}</td>
-                                        <td>{{ $clinicalNote->treatment_plan }}</td>
-                                        <td>{{ $clinicalNote->follow_up_recommendations }}</td>
-                                        <td>{{ $clinicalNote->referrals }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($clinicalNote->assessment_datetime)->format('l, F
-                                            j, Y \a\t g:i A') }}</td>
+                                        <td>{{ $medication->id }}</td>
+                                        <td>{{ $medication->patient->name }}</td>
+                                        <td>{{ $medication->medication_name }}</td>
+                                        <td>{{ $medication->dosage }}</td>
+                                        <td>{{ $medication->frequency }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($medication->start_date)->format('l, F j, Y') }}
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($medication->end_date)->format('l, F j, Y') }}</td>
                                         <td class="text-center">
                                             <a id="actions1Invoker" class="link-muted" href="#!" aria-haspopup="true"
                                                 aria-expanded="false" data-toggle="dropdown">
@@ -116,7 +115,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- End Clinical Notes -->
+                <!-- End Medication -->
             </div>
 
 

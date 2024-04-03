@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('vital_results', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('measurement_datetime');
-            $table->integer('blood_pressure');
-            $table->integer('heart_rate');
-            $table->integer('respiratory_rate');
-            $table->decimal('temperature', 5, 2);
-            $table->decimal('oxygen_saturation', 5, 2);
-            $table->decimal('weight', 5, 2);
-            $table->decimal('height', 5, 2);
-            $table->decimal('BMI', 5, 2);
+            $table->dateTime('measurement_datetime')->nullable();
+            $table->integer('blood_pressure')->nullable();
+            $table->integer('heart_rate')->nullable();
+            $table->integer('respiratory_rate')->nullable();
+            $table->decimal('temperature', 5, 2)->nullable();
+            $table->decimal('oxygen_saturation', 5, 2)->nullable();
+            $table->decimal('weight', 5, 2)->nullable();
+            $table->decimal('height', 5, 2)->nullable();
+            $table->decimal('BMI', 5, 2)->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

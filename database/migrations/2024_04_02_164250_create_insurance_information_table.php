@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('insurance_information', function (Blueprint $table) {
             $table->id();
-            $table->string('provider_name');
-            $table->date('coverage_start_date');
-            $table->date('coverage_end_date');
-            $table->decimal('copayment_amount', 8, 2);
-            $table->decimal('deductible', 8, 2);
+            $table->string('provider_name')->nullable();
+            $table->date('coverage_start_date')->nullable();
+            $table->date('coverage_end_date')->nullable();
+            $table->decimal('copayment_amount', 8, 2)->nullable();
+            $table->decimal('deductible', 8, 2)->nullable();
             $table->text('claim_details')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

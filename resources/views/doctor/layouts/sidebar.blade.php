@@ -30,9 +30,34 @@
 				<!-- End Tables -->
 
 				<li class="u-sidebar-nav-menu__item">
-					<a class="u-sidebar-nav-menu__link" href="{{route('doctors.index')}}">
+					<a class="u-sidebar-nav-menu__link {{ request()->routeIs('doctor.medication.index') ? 'active':'' }}"
+						href="{{route('doctor.medication.index')}}">
 						<i class="fa fa-medkit u-sidebar-nav-menu__item-icon"></i>
 						<span class="u-sidebar-nav-menu__item-title">Medication</span>
+					</a>
+				</li>
+
+				<li class="u-sidebar-nav-menu__item">
+					<a class="u-sidebar-nav-menu__link {{ request()->routeIs('doctor.labortory-result.index') ? 'active':'' }}"
+						href="{{route('doctor.labortory-result.index')}}">
+						<i class="fa fa-flask u-sidebar-nav-menu__item-icon"></i>
+						<span class="u-sidebar-nav-menu__item-title">Laboratory Tests</span>
+					</a>
+				</li>
+
+				<li class="u-sidebar-nav-menu__item">
+					<a class="u-sidebar-nav-menu__link {{ request()->routeIs('doctor.vital-result.index') ? 'active':'' }}"
+						href="{{route('doctor.vital-result.index')}}">
+						<i class="fa fa-heartbeat u-sidebar-nav-menu__item-icon"></i>
+						<span class="u-sidebar-nav-menu__item-title">Vital Results</span>
+					</a>
+				</li>
+
+				<li class="u-sidebar-nav-menu__item">
+					<a class="u-sidebar-nav-menu__link {{ request()->routeIs('doctor.immunization.index') ? 'active':'' }}"
+						href="{{route('doctor.immunization.index')}}">
+						<i class="fa fa-h-square u-sidebar-nav-menu__item-icon"></i>
+						<span class="u-sidebar-nav-menu__item-title">Immunization</span>
 					</a>
 				</li>
 

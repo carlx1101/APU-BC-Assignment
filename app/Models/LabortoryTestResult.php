@@ -9,6 +9,10 @@ class LabortoryTestResult extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
+    protected $table = "labortory_test_results";
+
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');
