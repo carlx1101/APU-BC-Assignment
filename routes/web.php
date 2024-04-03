@@ -4,6 +4,7 @@ use App\Http\Controllers\BlockchainController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\Doctor\ClinicalNoteController;
 use App\Http\Controllers\DoctorController;
 
 Route::get('/', function () {
@@ -49,6 +50,9 @@ All Admin Routes List
 Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 
     Route::get('/doctor/home', [HomeController::class, 'doctorHome'])->name('doctor.home');
+    Route::get('/doctor/clinical-note/create', [ClinicalNoteController::class, 'create'])->name('doctor.clinical-note.create');
+    Route::post('/doctor/clinical-note/store', [ClinicalNoteController::class, 'store'])->name('doctor.clinical-note.store');
+    Route::get('/doctor/clinical-note', [ClinicalNoteController::class, 'index'])->name('doctor.clinical-note.index');
 });
 
 /*------------------------------------------

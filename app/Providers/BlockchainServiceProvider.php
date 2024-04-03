@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 
@@ -56,14 +57,14 @@ class BlockchainServiceProvider extends ServiceProvider
             $masterPrivateKey = Config::get('blockchain.hospital_admin_master_key');
             $masterPublicKey = Config::get('blockchain.hospital_admin_master_public_key');
 
-            $this->generateAndStoreKeyPair($masterPrivateKey, $masterPublicKey, $user->role, $user->id);
+            $this->generateAndStoreKeyPair($masterPrivateKey, $masterPublicKey, $user);
         });
 
         Event::listen(Registered::class, function ($event) {
             $user = $event->user;
             $masterPrivateKey = Config::get('blockchain.hospital_admin_master_key');
             $masterPublicKey = Config::get('blockchain.hospital_admin_master_public_key');
-            $this->generateAndStoreKeyPair($masterPrivateKey, $masterPublicKey, $user->role, $user->id);
+            $this->generateAndStoreKeyPair($masterPrivateKey, $masterPublicKey, $user);
         });
     }
 
@@ -145,19 +146,33 @@ class BlockchainServiceProvider extends ServiceProvider
      *
      * @param string $masterPrivateKey Master private key
      * @param string $masterPublicKey Master public key
-     * @param string $type User type ('patient', 'doctor', 'admin')
-     * @param int $userId User ID
+     * @param User $user
      */
-    private function generateAndStoreKeyPair($masterPrivateKey, $masterPublicKey, $type, $userId)
+    private function generateAndStoreKeyPair($masterPrivateKey, $masterPublicKey, $user)
     {
-        $uuid = Str::uuid();
-        $privateKeyPath = "keys/{$uuid}/{$type}_private_key.pem";
-        $publicKeyPath = "keys/{$uuid}/{$type}_public_key.pem";
+        if (!$user->uuid) {
+            $uuid = Str::uuid();
+            $privateKeyPath = "keys/{$uuid}/{$user->role}_private_key.pem";
+            $publicKeyPath = "keys/{$uuid}/{$user->role}_public_key.pem";
+
+            $user->update(['uuid' => $uuid]);
+        } else {
+            $privateKeyPath = "keys/{$user->uuid}/{$user->role}_private_key.pem";
+            $publicKeyPath = "keys/{$user->uuid}/{$user->role}_public_key.pem";
+        }
 
         if (!Storage::exists($privateKeyPath) || !Storage::exists($publicKeyPath)) {
-            $keyPair = $this->generateUserKeyPair($masterPrivateKey, $masterPublicKey, $type);
+            $keyPair = $this->generateUserKeyPair($masterPrivateKey, $masterPublicKey, $user->role);
+
             Storage::put($privateKeyPath, $keyPair['privateKey']);
             Storage::put($publicKeyPath, $keyPair['publicKey']);
         }
+
+        // Set in configuration files
+        Config::set('blockchain.private_key', Storage::get($privateKeyPath));
+        Config::set('blockchain.public_key', Storage::get($publicKeyPath));
+
+        Session::put('public_key', Storage::get($publicKeyPath));
+        Session::put('private_key', Storage::get($privateKeyPath));
     }
 }

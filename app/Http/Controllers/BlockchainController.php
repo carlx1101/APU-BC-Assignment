@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blockchain;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
 
 class BlockchainController extends Controller
 {
@@ -21,8 +21,11 @@ class BlockchainController extends Controller
         $this->symmetricKey = Config::get('blockchain.symmetric_key');
 
         // Generate Public/Private Key Pair
-        $this->privateKey = Config::get('blockchain.private_key');
-        $this->publicKey = Config::get('blockchain.public_key');
+        $this->privateKey =
+            Session::get('private_key');
+
+        $this->publicKey =
+            Session::get('public_key');
     }
 
     /**
@@ -65,6 +68,12 @@ class BlockchainController extends Controller
      */
     private function signData($data, $privateKey)
     {
+        $data = json_encode($data); // Change to json string.
+
+        // Format Private Key
+        $privateKey =
+            "-----BEGIN PRIVATE KEY-----\n" . wordwrap($privateKey, 64, "\n", true) . "\n-----END PRIVATE KEY-----";
+
         openssl_sign($data, $signature, $privateKey, OPENSSL_ALGO_SHA256);
         return base64_encode($signature);
     }
@@ -87,10 +96,8 @@ class BlockchainController extends Controller
     /**
      *  Add block into Blockchain.
      */
-    public function addBlock(Request $request)
+    public function addBlock($data)
     {
-        $data = $request->all();
-
         // Encrypt Data and create digital signature
         $encryptedData = [
             'data' => isset($data['recipientPublicKey'])
