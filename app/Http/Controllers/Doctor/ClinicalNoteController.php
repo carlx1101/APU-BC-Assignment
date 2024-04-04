@@ -60,6 +60,8 @@ class ClinicalNoteController extends Controller
         $validatedData['assessment_datetime'] = now();
         $validatedData['doctor_id'] = Auth::user()->id;
 
+        $clinicalNote = ClinicalNote::create($validatedData); // Create the record
+
         if (isset($request['share_in_blockchain'])) {
             $validatedData['assessment_datetime'] = now()->format('Y-m-d H:i:s');
             $validatedData['patient_name'] = User::findOrFail($validatedData['patient_id'])->name;
@@ -70,9 +72,10 @@ class ClinicalNoteController extends Controller
                 'data' => $validatedData,
             ];
 
-            $this->blockchainController->addBlock($blockchainData);
-        } else {
-            ClinicalNote::create($validatedData);
+            $block = $this->blockchainController->addBlock($blockchainData);
+            $clinicalNote->update([
+                'hash_value' => route('doctor.clinical-note.view', ['hash' => $block['current_hash']]),
+            ]);
         }
 
         return redirect()->route('doctor.clinical-note.create')->with('success', 'Clinical notes added!');
@@ -100,8 +103,24 @@ class ClinicalNoteController extends Controller
             'recipientPublicKey' => Blockchain::getUserPublicKey($recipient->uuid, $recipient->role),
         ];
 
-        $this->blockchainController->addBlock($blockchainData);
+        $block = $this->blockchainController->addBlock($blockchainData);
+
+        ClinicalNote::findOrFail($id)->update([
+            'hash_value' => route('doctor.clinical-note.view', ['hash' => $block['current_hash']]),
+        ]);
 
         return redirect()->route('doctor.clinical-note.index')->with('success', 'Clinical note shared!');
+    }
+
+    /**
+     * View from blockchain
+     * 
+     */
+    public function view($current_hash)
+    {
+        $searchedBlock = $this->blockchainController->getBlock($current_hash);
+        $data = json_decode($searchedBlock['decrypted_data']);
+
+        return view('doctor.clinical_note.view', compact('data'));
     }
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\Doctor\LabortoryTestResultController;
 use App\Http\Controllers\Doctor\MedicationController;
 use App\Http\Controllers\Doctor\VitalResultController;
 use App\Http\Controllers\PreferenceController;
+use App\Models\Blockchain;
 
 Route::get('/', function () {
     return view('welcome');
@@ -62,6 +63,7 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
     Route::get('/doctor/clinical-note/create', [ClinicalNoteController::class, 'create'])->name('doctor.clinical-note.create');
     Route::post('/doctor/clinical-note/store', [ClinicalNoteController::class, 'store'])->name('doctor.clinical-note.store');
     Route::post('/doctor/clinical-note/{clinical_note_id}/share', [ClinicalNoteController::class, 'share'])->name('doctor.clinical-note.share');
+    Route::get('/doctor/clinical-note/{hash}', [ClinicalNoteController::class, 'view'])->name('doctor.clinical-note.view');
     Route::get('/doctor/clinical-note', [ClinicalNoteController::class, 'index'])->name('doctor.clinical-note.index');
 
     Route::get('/doctor/medication/create', [MedicationController::class, 'create'])->name('doctor.medication.create');

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Blockchain;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class BlockchainController extends Controller
 {
@@ -41,7 +43,9 @@ class BlockchainController extends Controller
                 'data' => 'Initial_Data',
                 'encrypted_symmetric_key' => 'Initial_Key',
                 'digital_signature' => 'Initial_Signature'
-            ]
+            ],
+            'sender_uuid' => 'Initial UUID',
+            'shared_publicly' => true
         ];
 
         $info = implode("+", [
@@ -100,12 +104,11 @@ class BlockchainController extends Controller
     {
         // Encrypt Data and create digital signature
         $encryptedData = [
-            'data' => isset($data['recipientPublicKey'])
-                ? Blockchain::encryptData(Blockchain::encryptData($data['data'], $this->symmetricKey), $data['recipientPublicKey'])
-                : Blockchain::encryptData($data['data'], $this->symmetricKey),
+            'data' =>
+            Blockchain::encryptData($data['data'], $this->symmetricKey),
             'encrypted_symmetric_key' => isset($data['recipientPublicKey'])
-                ? Blockchain::encryptData($this->symmetricKey, $data['recipientPublicKey'])
-                : Blockchain::encryptData($this->symmetricKey, $this->publicKey),
+                ? Blockchain::encryptAsymmetric($this->symmetricKey, Blockchain::formatPublicKeyToPEM($data['recipientPublicKey']))
+                : $this->symmetricKey,
             'digital_signature' => $this->signData($data['data'], $this->privateKey),
         ];
 
@@ -113,7 +116,9 @@ class BlockchainController extends Controller
             'index' => count(Blockchain::loadBlockchain()) + 1,
             'timestamp' => now()->format('Y-m-d H:i:s'),
             'prev_hash' => $this->getPrevHash(),
-            'transactions' => $encryptedData
+            'transactions' => $encryptedData,
+            'sender_uuid' => auth()->user()->uuid,
+            'shared_publicly' => isset($data['recipientPublicKey']) ? false : true,
         ];
 
         // Hash Block
@@ -131,6 +136,8 @@ class BlockchainController extends Controller
 
         // Store Updated Blockchain
         Blockchain::storeBlockchain($blockchain);
+
+        return $block;
     }
 
     /**
@@ -142,20 +149,39 @@ class BlockchainController extends Controller
 
         foreach ($blockchain as $block) {
             if ($block['current_hash'] === $block_hash) {
-                // Decrypt Data
-                $decryptedData = [
-                    'data' => Blockchain::decryptData($block['transactions']['data'], $this->symmetricKey),
-                    'encrypted_symmetric_key' => Blockchain::decryptData($block['transactions']['encrypted_symmetric_key'], $this->privateKey),
-                    'digital_signature' => $block['transactions']['digital_signature']
-                ];
+                // Get Sender Public Key
+                $user = User::where('uuid', $block['sender_uuid'])->firstOrFail();
+                $senderPublicKey = Storage::get("keys/{$user->uuid}/{$user->role}_public_key.pem");
+
+                if (!$block['shared_publicly']) {
+
+                    $encrypted_symmetric_key = str_replace('"', '', Blockchain::decryptAsymmetric($block['transactions']['encrypted_symmetric_key'], Blockchain::formatPrivateKeyToPEM($this->privateKey)));
+
+                    // Decrypt Data
+                    $decryptedData = [
+                        'data' => Blockchain::decryptData($block['transactions']['data'], $encrypted_symmetric_key),
+                        'encrypted_symmetric_key' => $encrypted_symmetric_key,
+                        'digital_signature' => $block['transactions']['digital_signature']
+                    ];
+                } else {
+                    // Decrypt Data
+                    $decryptedData = [
+                        'data' => Blockchain::decryptData($block['transactions']['data'], $block['transactions']['encrypted_symmetric_key']),
+                        'encrypted_symmetric_key' => $block['transactions']['encrypted_symmetric_key'],
+                        'digital_signature' => $block['transactions']['digital_signature']
+                    ];
+                }
+
 
                 // Verify Digital Signature
-                $isSignatureValid = Blockchain::verifySignature($decryptedData['data'], $decryptedData['digital_signature'], $this->publicKey);
+                $isSignatureValid = Blockchain::verifySignature($decryptedData['data'], $decryptedData['digital_signature'], $senderPublicKey);
 
-                return response()->json(['block' => $block, 'decrypted_data' => $decryptedData, 'is_signature_valid' => $isSignatureValid], 200);
+                !$isSignatureValid ? abort(403, 'Invalid Digital Signature') : '';
+
+                return ['decrypted_data' => $decryptedData['data'], 'sender_uuid' => $block['sender_uuid']];
             }
         }
 
-        return response()->json(['message' => 'Block not found'], 404);
+        return abort(404);
     }
 }

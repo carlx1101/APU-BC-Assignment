@@ -26,6 +26,10 @@ class Blockchain extends Model
      */
     public static function verifySignature($data, $signature, $publicKey)
     {
+        if (strpos($publicKey, '-----BEGIN PUBLIC KEY-----') === false) {
+            $publicKey = "-----BEGIN PUBLIC KEY-----\n" . wordwrap($publicKey, 64, "\n", true) . "\n-----END PUBLIC KEY-----";
+        }
+
         return openssl_verify($data, base64_decode($signature), $publicKey, OPENSSL_ALGO_SHA256) === 1;
     }
 
@@ -58,12 +62,32 @@ class Blockchain extends Model
     }
 
     /**
-     * Encrypt data from block.
+     * Decrypt data from block.
      */
     public static function decryptData($encryptedData, $key)
     {
         list($encryptedData, $salt, $iv) = explode('::', base64_decode($encryptedData), 3);
         return openssl_decrypt($encryptedData, 'aes-256-cbc', $key, 0, $iv);
+    }
+
+    /**
+     * Encrypt using asymmetric keys
+     */
+    public static function encryptAsymmetric($data, $key)
+    {
+        openssl_public_encrypt(json_encode($data), $encryptedData, $key);
+
+        return base64_encode($encryptedData);
+    }
+
+    /**
+     * Decrypt using asymmetric keys
+     */
+    public static function decryptAsymmetric($encryptedData, $key)
+    {
+        openssl_private_decrypt(base64_decode($encryptedData), $decryptedData, $key);
+
+        return json_decode($decryptedData, true);
     }
 
     /**
@@ -133,5 +157,20 @@ class Blockchain extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Change key to PEM formats
+     */
+    public static function formatPrivateKeyToPEM($privateKey)
+    {
+        $formattedKey = "-----BEGIN PRIVATE KEY-----\n" . wordwrap($privateKey, 64, "\n", true) . "\n-----END PRIVATE KEY-----";
+        return $formattedKey;
+    }
+
+    public static function formatPublicKeyToPEM($publicKey)
+    {
+        $formattedKey = "-----BEGIN PUBLIC KEY-----\n" . wordwrap($publicKey, 64, "\n", true) . "\n-----END PUBLIC KEY-----";
+        return $formattedKey;
     }
 }
