@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\BlockchainController;
 use App\Http\Controllers\Controller;
+use App\Models\Blockchain;
 use App\Models\ClinicalNote;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,8 +25,9 @@ class ClinicalNoteController extends Controller
     public function index()
     {
         $clinicalNotes = ClinicalNote::where('doctor_id', Auth::user()->id)->get();
+        $recipientList = User::where('id', '!=', auth()->user()->id)->get(['id', 'name']);
 
-        return view('doctor.clinical_note.index', compact('clinicalNotes'));
+        return view('doctor.clinical_note.index', compact('clinicalNotes'), compact('recipientList'));
     }
     /**
      * Show clinical note form.
@@ -74,5 +76,32 @@ class ClinicalNoteController extends Controller
         }
 
         return redirect()->route('doctor.clinical-note.create')->with('success', 'Clinical notes added!');
+    }
+
+    /**
+     * Share clinical note with recipient.
+     */
+
+    public function share($id, Request $request)
+    {
+        $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+        ]);
+
+        // Prepare data to store in blockchain
+        $data = ClinicalNote::findOrFail($id);
+        $recipient = User::findOrFail($request->recipient_id);
+        $data['patient_name'] = $recipient->name;
+        $data['doctor_name'] = Auth::user()->name;
+        $data['record_type'] = "medication_records";
+
+        $blockchainData = [
+            'data' => $data,
+            'recipientPublicKey' => Blockchain::getUserPublicKey($recipient->uuid, $recipient->role),
+        ];
+
+        $this->blockchainController->addBlock($blockchainData);
+
+        return redirect()->route('doctor.clinical-note.index')->with('success', 'Clinical note shared!');
     }
 }

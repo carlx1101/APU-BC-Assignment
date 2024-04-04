@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Blockchain extends Model
 {
@@ -93,9 +94,16 @@ class Blockchain extends Model
      */
     public static function storeBlockchain($blockchain)
     {
-        $filename = storage_path('blockchain.dat');
+        $filename = 'blockchain.dat';
+
+        if (Storage::exists($filename)) {
+            $existingBlockchain = self::loadBlockchain();
+            $existingBlockchain[] = end($blockchain);
+            $blockchain = $existingBlockchain;
+        }
+
         $data = serialize($blockchain);
-        file_put_contents($filename, $data);
+        Storage::put($filename, $data);
     }
 
     /**
@@ -103,13 +111,27 @@ class Blockchain extends Model
      */
     public static function loadBlockchain()
     {
-        $filename = storage_path('blockchain.dat');
+        $filename = 'blockchain.dat';
 
-        if (file_exists($filename)) {
-            $data = file_get_contents($filename);
+        if (Storage::exists($filename)) {
+            $data = Storage::get($filename);
             return unserialize($data);
         }
 
         return [];
+    }
+
+    /**
+     * Get user's public key by UUID.
+     */
+    public static function getUserPublicKey($uuid, $role)
+    {
+        $publicKeyPath = "keys/{$uuid}/{$role}_public_key.pem";
+
+        if (Storage::exists($publicKeyPath)) {
+            return Storage::get($publicKeyPath);
+        }
+
+        return null;
     }
 }
