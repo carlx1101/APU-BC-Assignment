@@ -34,7 +34,7 @@ class BlockchainController extends Controller
     public static function generateGenesisBlock()
     {
         $genesis_block = [
-            'index' => 1,
+            'index' => 0,
             'timestamp' => now()->format('Y-m-d H:i:s'),
             'prev_hash' => 0,
             'transactions' => [

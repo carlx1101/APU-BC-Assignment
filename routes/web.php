@@ -61,6 +61,7 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 
     Route::get('/doctor/clinical-note/create', [ClinicalNoteController::class, 'create'])->name('doctor.clinical-note.create');
     Route::post('/doctor/clinical-note/store', [ClinicalNoteController::class, 'store'])->name('doctor.clinical-note.store');
+    Route::post('/doctor/clinical-note/{clinical_note_id}/share', [ClinicalNoteController::class, 'share'])->name('doctor.clinical-note.share');
     Route::get('/doctor/clinical-note', [ClinicalNoteController::class, 'index'])->name('doctor.clinical-note.index');
 
     Route::get('/doctor/medication/create', [MedicationController::class, 'create'])->name('doctor.medication.create');
@@ -90,4 +91,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/blockchain/{block_hash}', [BlockchainController::class, 'getBlock']);
 });
 
-BlockchainController::generateGenesisBlock();
+// Generate Genesis Block
+if (!\Illuminate\Support\Facades\Storage::exists('blockchain.dat') || \Illuminate\Support\Facades\Storage::size('blockchain.dat') == 0) \App\Http\Controllers\BlockchainController::generateGenesisBlock();
