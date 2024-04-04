@@ -37,6 +37,7 @@
         @include('doctor.layouts.sidebar')
 
         <div class="u-content">
+            @include('components.alert')
             <div class="u-body">
                 <!-- End Breadcrumb -->
                 <div class="mb-4">
@@ -93,9 +94,29 @@
                                             <div class="dropdown-menu dropdown-menu-right dropdown"
                                                 style="width: 150px;" aria-labelledby="actions1Invoker">
                                                 <ul class="list-unstyled mb-0">
+                                                    @isset($medication->global_hash)
                                                     <li>
                                                         <a class="d-flex align-items-center link-muted py-2 px-3"
-                                                            href="#!">
+                                                            href="javascript:void(0);"
+                                                            onclick="navigator.clipboard.writeText('{{ $medication->global_hash }}').then(() => alert('Link copied to clipboard!'));">
+                                                            <i class="fa fa-clipboard mr-2"></i> Copy link
+                                                        </a>
+                                                    </li>
+                                                    @endisset
+                                                    @isset($medication->hash_value)
+                                                    <li>
+                                                        <a class="d-flex align-items-center link-muted py-2 px-3"
+                                                            href="javascript:void(0);"
+                                                            onclick="navigator.clipboard.writeText('{{ $medication->hash_value }}').then(() => alert('Link copied to clipboard!'));">
+                                                            <i class="fa fa-clipboard mr-2"></i> Copy link (Asymmetric)
+                                                        </a>
+                                                    </li>
+                                                    @endisset
+                                                    <li>
+                                                        <a class="d-flex align-items-center link-muted py-2 px-3 send-modal-btn"
+                                                            data-toggle="modal"
+                                                            data-medication-id="{{ $medication->id }}"
+                                                            href="#exampleModal">
                                                             <i class="fa fa-share-square mr-2"></i> Send
                                                         </a>
                                                     </li>
@@ -123,6 +144,41 @@
 
         </div>
     </main>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="" method="POST" id="recipientForm">
+                @csrf
+                @method('POST')
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Share Medication Record</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group mb-4">
+                            <label for="">Select Recipient</label>
+                            <select name="recipient_id" class="form-control">
+                                <option value="" selected>Select a recipient</option>
+                                @foreach ($recipientList as $recipient)
+                                <option value="{{ $recipient->id }}">{{ $recipient->name }}</option>
+                                @endforeach
+                            </select>
+                            <small class="form-text text-muted">Only the selected recipient will be able to view the
+                                information.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Global Vendor -->
     <script src="{{asset('assets/vendor/jquery/dist/jquery.min.js')}}"></script>
@@ -137,6 +193,23 @@
     <!-- Initialization  -->
     <script src="{{asset('assets/js/sidebar-nav.js')}}"></script>
     <script src="{{asset('assets/js/main.js')}}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.send-modal-btn').on('click', function(e) {
+            e.preventDefault();
+            
+            let medicationId = $(this).data('medication-id');
+            
+            $('#recipientForm').attr('action', `/doctor/medication/${medicationId}/share`);
+            $('#exampleModal').modal('show');
+            });
+            
+            $('#exampleModal').on('hidden.bs.modal', function() {
+            $('#recipientForm').attr('action', '');
+            });
+            });
+    </script>
 </body>
 
 </html>

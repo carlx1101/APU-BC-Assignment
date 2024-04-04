@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('reference_range')->nullable();
             $table->string('testing_facility')->nullable();
             $table->text('interpretation')->nullable();
+            $table->string('global_hash')->nullable();
+            $table->string('hash_value')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('physician_attendant_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

@@ -68,18 +68,26 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 
     Route::get('/doctor/medication/create', [MedicationController::class, 'create'])->name('doctor.medication.create');
     Route::post('/doctor/medication/store', [MedicationController::class, 'store'])->name('doctor.medication.store');
+    Route::post('/doctor/medication/{medication_id}/share', [MedicationController::class, 'share'])->name('doctor.medication.share');
+    Route::get('/doctor/medication/{hash}', [MedicationController::class, 'view'])->name('doctor.medication.view');
     Route::get('/doctor/medication', [MedicationController::class, 'index'])->name('doctor.medication.index');
 
     Route::get('/doctor/labortory-result/create', [LabortoryTestResultController::class, 'create'])->name('doctor.labortory-result.create');
     Route::post('/doctor/labortory-result/store', [LabortoryTestResultController::class, 'store'])->name('doctor.labortory-result.store');
+    Route::post('/doctor/labortory-result/{labortory-result_id}/share', [LabortoryTestResultController::class, 'share'])->name('doctor.labortory-result.share');
+    Route::get('/doctor/labortory-result/{hash}', [LabortoryTestResultController::class, 'view'])->name('doctor.labortory-result.view');
     Route::get('/doctor/labortory-result', [LabortoryTestResultController::class, 'index'])->name('doctor.labortory-result.index');
 
     Route::get('/doctor/vital-result/create', [VitalResultController::class, 'create'])->name('doctor.vital-result.create');
     Route::post('/doctor/vital-result/store', [VitalResultController::class, 'store'])->name('doctor.vital-result.store');
+    Route::post('/doctor/vital-result/{vital-result_id}/share', [VitalResultController::class, 'share'])->name('doctor.vital-result.share');
+    Route::get('/doctor/vital-result/{hash}', [VitalResultController::class, 'view'])->name('doctor.vital-result.view');
     Route::get('/doctor/vital-result', [VitalResultController::class, 'index'])->name('doctor.vital-result.index');
 
     Route::get('/doctor/immunization/create', [ImmunizationRecordController::class, 'create'])->name('doctor.immunization.create');
     Route::post('/doctor/immunization/store', [ImmunizationRecordController::class, 'store'])->name('doctor.immunization.store');
+    Route::post('/doctor/immunization/{immunization_id}/share', [ImmunizationRecordController::class, 'share'])->name('doctor.immunization.share');
+    Route::get('/doctor/immunization/{hash}', [ImmunizationRecordController::class, 'view'])->name('doctor.immunization.view');
     Route::get('/doctor/immunization', [ImmunizationRecordController::class, 'index'])->name('doctor.immunization.index');
 });
 

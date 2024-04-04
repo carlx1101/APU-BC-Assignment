@@ -19,6 +19,8 @@ return new class extends Migration
             $table->date('onset_date')->nullable();
             $table->date('resolution_date')->nullable();
             $table->text('management_plan')->nullable();
+            $table->string('global_hash')->nullable();
+            $table->string('hash_value')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

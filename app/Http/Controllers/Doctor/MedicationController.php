@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\BlockchainController;
 use App\Http\Controllers\Controller;
+use App\Models\Blockchain;
 use App\Models\MedicationRecord;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,7 +23,9 @@ class MedicationController extends Controller
     public function index()
     {
         $medications = MedicationRecord::where('doctor_id', Auth::user()->id)->get();
-        return view('doctor.medication.index', compact('medications'));
+        $recipientList = User::where('id', '!=', auth()->user()->id)->get(['id', 'name']);
+
+        return view('doctor.medication.index', compact('medications'), compact('recipientList'));
     }
 
     /**
@@ -52,6 +55,8 @@ class MedicationController extends Controller
 
         $validatedData['doctor_id'] = Auth::user()->id;
 
+        $medicationRecord = MedicationRecord::create($validatedData);
+
         if (isset($request['share_in_blockchain'])) {
             $validatedData['patient_name'] = User::findOrFail($validatedData['patient_id'])->name;
             $validatedData['doctor_name'] = Auth::user()->name;
@@ -61,11 +66,56 @@ class MedicationController extends Controller
                 'data' => $validatedData,
             ];
 
-            $this->blockchainController->addBlock($blockchainData);
-        } else {
-            MedicationRecord::create($validatedData);
+            $block = $this->blockchainController->addBlock($blockchainData);
+
+            $medicationRecord->update([
+                'global_hash' => route('doctor.medication.view', ['hash' => $block['current_hash']]),
+            ]);
         }
 
         return redirect()->route('doctor.medication.create')->with('success', 'Medication added!');
+    }
+
+    /**
+     * Share medication with recipient.
+     */
+
+    public function share($id, Request $request)
+    {
+        $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+        ]);
+
+        // Prepare data to store in blockchain
+        $data = MedicationRecord::findOrFail($id);
+        $recipient = User::findOrFail($request->recipient_id);
+        $data['patient_name'] = $recipient->name;
+        $data['doctor_name'] = Auth::user()->name;
+        $data['record_type'] = "medication_records";
+
+        $blockchainData = [
+            'data' => $data,
+            'recipientPublicKey' => Blockchain::getUserPublicKey($recipient->uuid, $recipient->role),
+        ];
+
+        $block = $this->blockchainController->addBlock($blockchainData);
+
+        MedicationRecord::findOrFail($id)->update([
+            'hash_value' => route('doctor.medication.view', ['hash' => $block['current_hash']]),
+        ]);
+
+        return redirect()->route('doctor.medication.index')->with('success', 'Medication record shared!');
+    }
+
+    /**
+     * View from blockchain
+     * 
+     */
+    public function view($current_hash)
+    {
+        $searchedBlock = $this->blockchainController->getBlock($current_hash);
+        $data = json_decode($searchedBlock['decrypted_data']);
+
+        return view('doctor.medication.view', compact('data'));
     }
 }

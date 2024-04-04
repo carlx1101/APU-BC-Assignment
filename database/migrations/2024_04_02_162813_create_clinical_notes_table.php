@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('procedures')->nullable();
             $table->text('assessment_findings')->nullable();
             $table->text('risks_management')->nullable();
+            $table->string('global_hash')->nullable();
             $table->foreignId('doctor_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

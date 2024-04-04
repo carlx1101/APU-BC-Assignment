@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BlockchainController;
+use App\Models\Blockchain;
 use App\Models\ImmunizationRecord;
 use App\Models\User;
 
@@ -24,8 +25,9 @@ class ImmunizationRecordController extends Controller
     public function index()
     {
         $immunizationRecords = ImmunizationRecord::where('immunization_provider_id', Auth::user()->id)->get();
+        $recipientList = User::where('id', '!=', auth()->user()->id)->get(['id', 'name']);
 
-        return view('doctor.immunization.index', compact('immunizationRecords'));
+        return view('doctor.immunization.index', compact('immunizationRecords'), compact('recipientList'));
     }
     /**
      * Show clinical note form.
@@ -62,20 +64,67 @@ class ImmunizationRecordController extends Controller
 
         $validatedData['immunization_provider_id'] = Auth::user()->id;
 
+        $immunizationRecord = ImmunizationRecord::create($validatedData);
+
         if (isset($request['share_in_blockchain'])) {
             $validatedData['patient_name'] = User::findOrFail($validatedData['patient_id'])->name;
-            $validatedData['doctor_name'] = Auth::user()->name;
+            $validatedData['immunization_provider_name'] = Auth::user()->name;
             $validatedData['record_type'] = "immunization_records";
 
             $blockchainData = [
                 'data' => $validatedData,
             ];
 
-            $this->blockchainController->addBlock($blockchainData);
-        } else {
-            ImmunizationRecord::create($validatedData);
+            $block = $this->blockchainController->addBlock($blockchainData);
         }
 
+        $immunizationRecord->update([
+            'global_hash' => route('doctor.immunization.view', ['hash' => $block['current_hash']]),
+        ]);
+
         return redirect()->route('doctor.immunization.create')->with('success', 'Immunization record added!');
+    }
+
+    /**
+     * Share vital results with recipient.
+     */
+
+    public function share($id, Request $request)
+    {
+        $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+        ]);
+
+        // Prepare data to store in blockchain
+        $data = ImmunizationRecord::findOrFail($id);
+        $recipient = User::findOrFail($request->recipient_id);
+        $data['patient_name'] = $recipient->name;
+        $data['immunization_provider_name'] = Auth::user()->name;
+        $data['record_type'] = "immunization_records";
+
+        $blockchainData = [
+            'data' => $data,
+            'recipientPublicKey' => Blockchain::getUserPublicKey($recipient->uuid, $recipient->role),
+        ];
+
+        $block = $this->blockchainController->addBlock($blockchainData);
+
+        ImmunizationRecord::findOrFail($id)->update([
+            'hash_value' => route('doctor.immunization.view', ['hash' => $block['current_hash']]),
+        ]);
+
+        return redirect()->route('doctor.immunization.index')->with('success', 'Immunization Record shared!');
+    }
+
+    /**
+     * View from blockchain
+     * 
+     */
+    public function view($current_hash)
+    {
+        $searchedBlock = $this->blockchainController->getBlock($current_hash);
+        $data = json_decode($searchedBlock['decrypted_data']);
+
+        return view('doctor.immunization.view', compact('data'));
     }
 }

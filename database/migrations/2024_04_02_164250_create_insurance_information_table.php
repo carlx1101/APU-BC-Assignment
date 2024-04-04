@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('copayment_amount', 8, 2)->nullable();
             $table->decimal('deductible', 8, 2)->nullable();
             $table->text('claim_details')->nullable();
+            $table->string('global_hash')->nullable();
+            $table->string('hash_value')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
