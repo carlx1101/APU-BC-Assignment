@@ -26,6 +26,8 @@ return new class extends Migration
             $table->text('contraindications')->nullable();
             $table->string('patient_consent')->nullable();
             $table->text('vaccination_schedule')->nullable();
+            $table->string('global_hash')->nullable();
+            $table->string('hash_value')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('immunization_provider_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

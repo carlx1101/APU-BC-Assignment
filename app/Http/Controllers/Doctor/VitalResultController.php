@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\BlockchainController;
 use App\Http\Controllers\Controller;
+use App\Models\Blockchain;
 use App\Models\User;
 use App\Models\VitalResult;
 use Illuminate\Http\Request;
@@ -24,8 +25,9 @@ class VitalResultController extends Controller
     public function index()
     {
         $vitalResults = VitalResult::all();
+        $recipientList = User::where('id', '!=', auth()->user()->id)->get(['id', 'name']);
 
-        return view('doctor.vital-result.index', compact('vitalResults'));
+        return view('doctor.vital-result.index', compact('vitalResults'), compact('recipientList'));
     }
     /**
      * Show clinical note form.
@@ -57,7 +59,7 @@ class VitalResultController extends Controller
 
         $validatedData['measurement_datetime'] = now();
 
-        VitalResult::create($validatedData); // Store in Database
+        $vitalResult = VitalResult::create($validatedData); // Store in Database
 
         // Store in blockchain
         $validatedData['measurement_datetime'] = now()->format('Y-m-d H:i:s');
@@ -68,8 +70,55 @@ class VitalResultController extends Controller
             'data' => $validatedData,
         ];
 
-        $this->blockchainController->addBlock($blockchainData);
+        $block = $this->blockchainController->addBlock($blockchainData);
+
+        $vitalResult->update([
+            'global_hash' => route('doctor.vital-result.view', ['hash' => $block['current_hash']]),
+        ]);
 
         return redirect()->route('doctor.vital-result.create')->with('success', 'Vital record added!');
+    }
+
+    /**
+     * Share vital results with recipient.
+     */
+
+    public function share($id, Request $request)
+    {
+        $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+        ]);
+
+        // Prepare data to store in blockchain
+        $data = VitalResult::findOrFail($id);
+        $recipient = User::findOrFail($request->recipient_id);
+        $data['patient_name'] = $recipient->name;
+        $data['doctor_name'] = Auth::user()->name;
+        $data['record_type'] = "vital_results";
+
+        $blockchainData = [
+            'data' => $data,
+            'recipientPublicKey' => Blockchain::getUserPublicKey($recipient->uuid, $recipient->role),
+        ];
+
+        $block = $this->blockchainController->addBlock($blockchainData);
+
+        VitalResult::findOrFail($id)->update([
+            'hash_value' => route('doctor.vital-result.view', ['hash' => $block['current_hash']]),
+        ]);
+
+        return redirect()->route('doctor.vital-result.index')->with('success', 'Vital Record shared!');
+    }
+
+    /**
+     * View from blockchain
+     * 
+     */
+    public function view($current_hash)
+    {
+        $searchedBlock = $this->blockchainController->getBlock($current_hash);
+        $data = json_decode($searchedBlock['decrypted_data']);
+
+        return view('doctor.vital-result.view', compact('data'));
     }
 }

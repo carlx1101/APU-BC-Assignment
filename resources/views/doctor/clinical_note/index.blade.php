@@ -95,6 +95,24 @@
                                             <div class="dropdown-menu dropdown-menu-right dropdown"
                                                 style="width: 150px;" aria-labelledby="actions1Invoker">
                                                 <ul class="list-unstyled mb-0">
+                                                    @isset($clinicalNote->global_hash)
+                                                    <li>
+                                                        <a class="d-flex align-items-center link-muted py-2 px-3"
+                                                            href="javascript:void(0);"
+                                                            onclick="navigator.clipboard.writeText('{{ $clinicalNote->global_hash }}').then(() => alert('Link copied to clipboard!'));">
+                                                            <i class="fa fa-clipboard mr-2"></i> Copy link
+                                                        </a>
+                                                    </li>
+                                                    @endisset
+                                                    @isset($clinicalNote->hash_value)
+                                                    <li>
+                                                        <a class="d-flex align-items-center link-muted py-2 px-3"
+                                                            href="javascript:void(0);"
+                                                            onclick="navigator.clipboard.writeText('{{ $clinicalNote->hash_value }}').then(() => alert('Link copied to clipboard!'));">
+                                                            <i class="fa fa-clipboard mr-2"></i> Copy link (Asymmetric)
+                                                        </a>
+                                                    </li>
+                                                    @endisset
                                                     <li>
                                                         <a class="d-flex align-items-center link-muted py-2 px-3 send-modal-btn"
                                                             data-toggle="modal"

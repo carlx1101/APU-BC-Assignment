@@ -74,7 +74,7 @@ class ClinicalNoteController extends Controller
 
             $block = $this->blockchainController->addBlock($blockchainData);
             $clinicalNote->update([
-                'hash_value' => route('doctor.clinical-note.view', ['hash' => $block['current_hash']]),
+                'global_hash' => route('doctor.clinical-note.view', ['hash' => $block['current_hash']]),
             ]);
         }
 
@@ -96,7 +96,7 @@ class ClinicalNoteController extends Controller
         $recipient = User::findOrFail($request->recipient_id);
         $data['patient_name'] = $recipient->name;
         $data['doctor_name'] = Auth::user()->name;
-        $data['record_type'] = "medication_records";
+        $data['record_type'] = "clinical_notes";
 
         $blockchainData = [
             'data' => $data,

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('frequency')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->string('global_hash')->nullable();
+            $table->string('hash_value')->nullable();
             $table->foreignId('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('doctor_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

@@ -27,6 +27,12 @@ class CreateUsersSeeder extends Seeder
                 'password' => bcrypt('password123'),
             ],
             [
+                'name' => 'Doctor 2',
+                'email' => 'doctor2@bcd.com',
+                'role' => 2,
+                'password' => bcrypt('password123'),
+            ],
+            [
                 'name' => 'BCD Patient',
                 'email' => 'patient@bcd.com',
                 'role' => 0,
