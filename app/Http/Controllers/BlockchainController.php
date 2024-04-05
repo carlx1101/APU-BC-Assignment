@@ -176,7 +176,7 @@ class BlockchainController extends Controller
                 // Verify Digital Signature
                 $isSignatureValid = Blockchain::verifySignature($decryptedData['data'], $decryptedData['digital_signature'], $senderPublicKey);
 
-                !$isSignatureValid ? abort(403, 'Invalid Digital Signature') : '';
+                !$isSignatureValid ? abort(403, "You do not have permission to view this message.") : '';
 
                 return ['decrypted_data' => $decryptedData['data'], 'sender_uuid' => $block['sender_uuid']];
             }
