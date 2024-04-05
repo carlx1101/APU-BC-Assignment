@@ -28,15 +28,6 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/clinical-note/{hash}', [ClinicalNoteController::class, 'view'])->name('doctor.clinical-note.view');
-    Route::get('/medication/{hash}', [MedicationController::class, 'view'])->name('doctor.medication.view');
-    Route::get('/labortory-result/{hash}', [LabortoryTestResultController::class, 'view'])->name('doctor.labortory-result.view');
-    Route::get('/vital-result/{hash}', [VitalResultController::class, 'view'])->name('doctor.vital-result.view');
-    Route::get('/medical-history/{hash}', [MedicalHistoryController::class, 'view'])->name('patient.medical-history.view');
-    Route::get('/immunization/{hash}', [ImmunizationRecordController::class, 'view'])->name('doctor.immunization.view');
-});
-
 
 Route::middleware(['auth', 'user-access:patient'])->group(function () {
 
@@ -102,6 +93,14 @@ Route::middleware(['auth', 'user-access:doctor'])->group(function () {
 Blockchain Routes
 --------------------------------------------
 --------------------------------------------*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/clinical-note/{hash}', [ClinicalNoteController::class, 'view'])->name('doctor.clinical-note.view');
+    Route::get('/medication/{hash}', [MedicationController::class, 'view'])->name('doctor.medication.view');
+    Route::get('/labortory-result/{hash}', [LabortoryTestResultController::class, 'view'])->name('doctor.labortory-result.view');
+    Route::get('/vital-result/{hash}', [VitalResultController::class, 'view'])->name('doctor.vital-result.view');
+    Route::get('/medical-history/{hash}', [MedicalHistoryController::class, 'view'])->name('patient.medical-history.view');
+    Route::get('/immunization/{hash}', [ImmunizationRecordController::class, 'view'])->name('doctor.immunization.view');
+});
 Route::middleware(['auth'])->group(function () {
     Route::post('/blockchain/add', [BlockchainController::class, 'addBlock']);
     Route::get('/blockchain/{block_hash}', [BlockchainController::class, 'getBlock']);
