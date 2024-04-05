@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('medical_histories', function (Blueprint $table) {
             $table->id();
-            $table->text('diagnosis_record');
-            $table->text('treatment_details');
+            $table->text('diagnosis_record')->nullable();
+            $table->text('treatment_details')->nullable();
             $table->text('surgery')->nullable();
             $table->text('hospitalization_history')->nullable();
             $table->text('chronic_conditions')->nullable();
